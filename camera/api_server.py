@@ -1,12 +1,12 @@
 from flask import Flask, Response, jsonify
-from flask_cors import CORS 
+from flask_cors import CORS # CORS import
 import cv2
 import mediapipe as mp
 import time
 import os
 
 app = Flask(__name__)
-CORS(app, origins=["https://neckproject-fronted.onrender.com"])
+CORS(app, origins=["https://neckproject-frontend.onrender.com"])
 
 # MediaPipe Face Detection 초기화
 mp_face_detection = mp.solutions.face_detection
