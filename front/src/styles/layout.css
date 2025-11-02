@@ -1,0 +1,110 @@
+/* 전체 페이지 */
+.camera-page {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* 카메라 영역 */
+.camera-container {
+  position: absolute;
+  top: 42%;
+  left: 25.5%;
+  transform: translate(-50%, -50%);
+  width: 970px;
+  height: 580px;
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative; /* 자식 요소의 기준점이 되도록 설정 */
+}
+
+.camera-feed {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* 자세 바 영역 */
+.posturebar-container {
+  position: absolute;
+  bottom: 160px;
+  left: 46.5%;
+  transform: translateX(-50%);
+  width: 970px;
+}
+
+/* 기준 설정 버튼 */
+.calibrate-button-container {
+  position: absolute;
+  bottom: 20px; /* 하단에서 20px */
+  right: 20px;  /* 오른쪽에서 20px */
+  z-index: 10;
+}
+
+.calibrate-image-button {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.calibrate-image-button img {
+  display: block;
+  width: 80px; /* 이미지 크기 조절 */
+  height: auto;
+  transition: transform 0.2s ease;
+}
+
+.calibrate-image-button:hover img {
+  transform: scale(1.05); /* 마우스 올리면 살짝 커짐 */
+}
+
+
+/* 자세 정확도 바 */
+.posture-bar-wrapper {
+  text-align: center;
+}
+
+.posture-bar-label {
+  margin-bottom: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+}
+
+.posture-bar-bg {
+  width: 100%;
+  height: 14px;
+  background-color: #eee;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.posture-bar-fill {
+  height: 100%;
+  border-radius: 8px;
+  transition: width 0.4s ease, background-color 0.3s ease;
+}
+
+/* 경고 알림 팝업 */
+.alert-popup {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1000;
+  transform: translateY(150%); /* 시작 위치 (아래) */
+  opacity: 0;
+  transition: transform 0.5s ease-out, opacity 0.5s ease-out;
+  cursor: pointer; /* 클릭 가능하도록 커서 변경 */
+}
+
+.alert-popup.show {
+  transform: translateY(0); /* 최종 위치 (제자리) */
+  opacity: 1;
+}
+
+.alert-popup img {
+  width: 335px; /* 이미지 크기 */
+  height: auto;
+}
