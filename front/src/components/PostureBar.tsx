@@ -6,39 +6,46 @@ interface PostureBarProps {
 }
 
 const PostureBar: React.FC<PostureBarProps> = ({ accuracy, status }) => {
-  // 상태(status)와 정확도에 따라 바 색상 결정
-  const getBarColor = () => {
-    if (accuracy < 70) {
-      return "#F44336"; // 빨간색 (정확도 70% 미만)
-    }
-    switch (status) {
-      case "Forward Head":
-        return "#F44336"; // 빨간색
-      case "Good Posture":
-        return "#4CAF50"; // 초록색
-      case "Face Not Detected":
-        return "#FFC107"; // 노란색
-      default:
-        return "#9E9E9E"; // 회색 (Not Calibrated 등)
-    }
+  const getColor = () => {
+    if (status === "Forward Head") return "#ff3b30";
+    if (status === "Good Posture") return "#4cd964";
+    return "#999";
   };
 
   return (
-    <div className="posture-bar-wrapper">
-      <div className="posture-bar-label">
-        자세 정확도: {accuracy}%
-      </div>
-      <div className="posture-bar-bg">
+    <div className="posturebar-container">
+      <div
+        style={{
+          backgroundColor: "#ccc",
+          borderRadius: "20px",
+          width: "80%",
+          height: "20px",
+          margin: "0 auto",
+          overflow: "hidden",
+        }}
+      >
         <div
-          className="posture-bar-fill"
           style={{
             width: `${accuracy}%`,
-            backgroundColor: getBarColor(),
+            height: "100%",
+            backgroundColor: getColor(),
+            transition: "width 0.3s ease",
           }}
         ></div>
       </div>
+      <p
+        style={{
+          color: "#000",
+          fontWeight: "bold",
+          textAlign: "center",
+          marginTop: "10px",
+        }}
+      >
+        {status} — {accuracy}%
+      </p>
     </div>
   );
 };
 
 export default PostureBar;
+

@@ -1,69 +1,64 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import "../styles/layout.css";
 import CameraStream from "../components/CameraStream";
 import PostureBar from "../components/PostureBar";
+import CalibrateButton from "../components/CalibrateButton";
+import AlertPopup from "../components/AlertPopup";
 import bgImage from "../assets/images/camerapage.png";
-import calibrateButtonImage from "../assets/images/calibrate.png";
-import alertImage from "../assets/images/alert.png"; // 경고 이미지 import
 
 const CameraPage: React.FC = () => {
+  const [baselineArea, setBaselineArea] = useState<number | null>(null);
+  const [currentArea, setCurrentArea] = useState<number | null>(null);
   const [accuracy, setAccuracy] = useState(100);
   const [status, setStatus] = useState("Not Calibrated");
+  const [hasBeenWarned, setHasBeenWarned] = useState(false);
 
-  const BASE_URL =
-  import.meta.env.MODE === "production"
-    ? import.meta.env.VITE_API_BASE_URL
-    : "http://localhost:8000";
+  // 얼굴 감지 콜백
+  const handleDetect = (area: number | null) => {
+    setCurrentArea(area);
 
-  useEffect(() => {
-    const interval = setInterval(async () => {
-      try {
-        const res = await fetch(`${BASE_URL}/posture`);
-        const data = await res.json();
-        if (data.accuracy !== undefined) {
-          setAccuracy(data.accuracy);
-        }
-        if (data.status !== undefined) {
-          setStatus(data.status);
-        }
-      } catch (error) {
-        console.error("Failed to fetch posture data:", error);
-        setStatus("Server Disconnected");
-        setAccuracy(0);
-      }
-    }, 500); // 0.5초마다 데이터 갱신
+    if (area === null) {
+      setStatus("Face Not Detected");
+      setAccuracy(0);
+      return;
+    }
 
-    return () => clearInterval(interval);
-  }, []);
+    if (baselineArea === null) {
+      setStatus("Press Calibrate Button");
+      return;
+    }
 
-  // 기준 설정 버튼 클릭 시 호출될 함수
-  const handleCalibrate = async () => {
-    try {
-      const response = await fetch(`${BASE_URL}/calibrate`, {
-        method: 'POST',
-      });
-      if (response.ok) {
-        console.log("Calibration signal sent successfully.");
-      } else {
-        console.error("Failed to send calibration signal.");
-      }
-    } catch (error) {
-      console.error("Error sending calibration signal:", error);
+    const ratio = area / baselineArea;
+    let currentStatus = "Good Posture";
+    let currentAccuracy = 100;
+
+    if (ratio > 1.2) {
+      currentStatus = "Forward Head";
+      currentAccuracy = Math.max(
+        0,
+        Math.min(100, (1.2 - ratio) / (1.2 - 1.0) * 100)
+      );
+    } else {
+      currentAccuracy = Math.max(
+        0,
+        Math.min(100, (1.2 - ratio) / (1.2 - 1.0) * 100)
+      );
+    }
+
+    setStatus(currentStatus);
+    setAccuracy(Math.round(currentAccuracy));
+
+    if (currentAccuracy < 70 && currentStatus === "Forward Head") {
+      setHasBeenWarned(true);
     }
   };
 
-  const [hasBeenWarned, setHasBeenWarned] = useState(false);
-
-  useEffect(() => {
-    // 한 번이라도 정확도가 70% 미만으로 떨어지면 경고를 표시하고, 그 상태를 유지합니다.
-    if (accuracy < 70 && status !== 'Not Calibrated' && status !== 'Server Disconnected') {
-      setHasBeenWarned(true);
+  // 기준 설정 버튼 클릭
+  const handleCalibrate = () => {
+    if (currentArea) {
+      setBaselineArea(currentArea);
+      setStatus("Calibrated");
     }
-  }, [accuracy, status]);
-
-  // 경고 팝업 클릭 시 호출될 함수
-  const handleAlertClick = () => {
-    setHasBeenWarned(false);
   };
 
   return (
@@ -80,26 +75,19 @@ const CameraPage: React.FC = () => {
         overflow: "hidden",
       }}
     >
-      {/* 카메라 영상 */}
+      {/* 카메라 + 버튼 */}
       <div className="camera-container">
-        <CameraStream />
-        {/* 기준 설정 이미지 버튼 */}
-        <div className="calibrate-button-container">
-          <button onClick={handleCalibrate} className="calibrate-image-button">
-            <img src={calibrateButtonImage} alt="Calibrate Posture" />
-          </button>
-        </div>
+        <CameraStream onDetect={handleDetect} />
+        <CalibrateButton onCalibrate={handleCalibrate} />
       </div>
 
       {/* 자세 정확도 바 */}
-      <div className="posturebar-container">
-        <PostureBar accuracy={accuracy} status={status} />
-      </div>
+      <PostureBar accuracy={accuracy} status={status} />
 
-      {/* 경고 알림 팝업 */}
-      <div className={`alert-popup ${hasBeenWarned ? 'show' : ''}`} onClick={handleAlertClick}>
-        <img src={alertImage} alt="Posture Warning" />
-      </div>
+      {/* 경고 팝업 */}
+      {hasBeenWarned && (
+        <AlertPopup onClose={() => setHasBeenWarned(false)} />
+      )}
     </div>
   );
 };
