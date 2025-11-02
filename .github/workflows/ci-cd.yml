@@ -1,4 +1,4 @@
-name: Build and Test
+name: Build, Test, and Deploy
 
 on:
   push:
@@ -26,6 +26,7 @@ jobs:
           cd camera
           python -m venv venv
           source venv/bin/activate
+          pip install --upgrade pip
           pip install -r requirements.txt
 
       - name: Lint backend (syntax check)
@@ -48,3 +49,22 @@ jobs:
         run: |
           cd front
           npm run build
+
+  deploy:
+    needs: build       # 빌드 성공 후 실행됨
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Trigger Render deploy
+        env:
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+          RENDER_SERVICE_ID: srv-d43qn1be5dus73a8l3g0  # 현정 Render 서비스 ID
+        run: |
+          echo "🚀 Build successful — triggering Render deploy..."
+          curl -X POST \
+            -H "Accept: application/json" \
+            -H "Authorization: Bearer $RENDER_API_KEY" \
+            -H "Content-Type: application/json" \
+            -d '{"clearCache": false}' \
+            https://api.render.com/v1/services/$RENDER_SERVICE_ID/deploys
+          echo "✅ Render deploy triggered! Check https://neckproject.onrender.com"
