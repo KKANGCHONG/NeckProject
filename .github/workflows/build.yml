@@ -1,0 +1,50 @@
+name: Build and Test
+
+on:
+  push:
+    branches: [ deploy ]
+  pull_request:
+    branches: [ deploy ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1️⃣ 깃허브 레포 체크아웃
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2️⃣ 백엔드 (Flask) 환경 세팅
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Install backend dependencies
+        run: |
+          cd camera
+          python -m venv venv
+          source venv/bin/activate
+          pip install -r requirements.txt
+
+      - name: Lint backend (syntax check)
+        run: |
+          source camera/venv/bin/activate
+          python -m compileall camera/api_server.py
+
+      # 3️⃣ 프론트엔드 (Vite) 빌드
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install frontend dependencies
+        run: |
+          cd front
+          npm ci
+
+      - name: Build frontend
+        run: |
+          cd front
+          npm run build
