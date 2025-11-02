@@ -3,5 +3,5 @@ flask-cors==4.0.0
 mediapipe==0.10.5
 opencv-python==4.10.0.84
 numpy==1.26.4
-protobuf==4.25.3
+protobuf==3.20.3
 werkzeug==3.0.3
