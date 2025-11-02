@@ -1,12 +1,15 @@
 import React from "react";
 
+const BASE_URL =
+  import.meta.env.MODE === "production"
+    ? import.meta.env.VITE_API_BASE_URL
+    : "http://localhost:8000";
+    
 const CameraStream: React.FC = () => {
-  // Flask 백엔드에서 스트리밍 받을 경우: src="http://localhost:8000/stream"
-  // 지금은 테스트용으로 회색 박스로 대체
   return (
     <div className="camera-stream">
       <img
-        src="http://localhost:8000/stream"
+        src={`${import.meta.env.VITE_API_BASE_URL}/stream`}
         alt="Camera Stream"
         className="camera-feed"
         onError={(e) => {
