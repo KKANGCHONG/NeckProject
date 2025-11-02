@@ -10,10 +10,15 @@ const CameraPage: React.FC = () => {
   const [accuracy, setAccuracy] = useState(100);
   const [status, setStatus] = useState("Not Calibrated");
 
+    const BASE_URL =
+    import.meta.env.MODE === "production"
+      ? import.meta.env.VITE_API_BASE_URL
+      : "http://localhost:8000";
+
   useEffect(() => {
     const interval = setInterval(async () => {
       try {
-        const res = await fetch("http://localhost:8000/posture");
+        const res = await fetch(`${BASE_URL}/posture`);
         const data = await res.json();
         if (data.accuracy !== undefined) {
           setAccuracy(data.accuracy);
