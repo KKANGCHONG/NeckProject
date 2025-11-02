@@ -15,4 +15,9 @@ export default defineConfig({
     port: 5173, // 기본 포트
     open: true, // npm run dev 시 자동으로 브라우저 열기
     },
+    preview: {
+    host: "0.0.0.0",
+    port: Number(process.env.PORT) || 4173,
+    allowedHosts: ["neckproject-fronted.onrender.com"], // 👈 여기가 핵심!
+  },
 });
