@@ -1,20 +1,39 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 
-const BASE_URL =
-  import.meta.env.MODE === "production"
-    ? import.meta.env.VITE_API_BASE_URL
-    : "http://localhost:8000";
-    
 const CameraStream: React.FC = () => {
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    const startCamera = async () => {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: "user" }, // 전면 카메라 우선
+          audio: false,
+        });
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+        }
+      } catch (err) {
+        console.error("카메라 접근 실패:", err);
+        alert("카메라 접근 권한을 허용해야 합니다!");
+      }
+    };
+
+    startCamera();
+  }, []);
+
   return (
     <div className="camera-stream">
-      <img
-        src={`${import.meta.env.VITE_API_BASE_URL}/stream`}
-        alt="Camera Stream"
-        className="camera-feed"
-        onError={(e) => {
-          (e.target as HTMLImageElement).src =
-            "https://via.placeholder.com/640x360?text=Camera+Stream";
+      <video
+        ref={videoRef}
+        autoPlay
+        playsInline
+        muted
+        style={{
+          width: "100%",
+          height: "auto",
+          borderRadius: "10px",
+          backgroundColor: "#000",
         }}
       />
     </div>
