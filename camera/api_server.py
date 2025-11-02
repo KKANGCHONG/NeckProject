@@ -6,7 +6,7 @@ import time
 import os
 
 app = Flask(__name__)
-CORS(app, origins=["https://neckproject-frontend.onrender.com"])
+CORS(app, origins=["https://neckproject-fronted.onrender.com/"])
 
 # MediaPipe Face Detection 초기화
 mp_face_detection = mp.solutions.face_detection
