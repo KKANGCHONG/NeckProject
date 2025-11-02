@@ -1,4 +1,4 @@
-name: Build, Test, and Deploy
+name: TurtleFlow 🐢 (Full-stack CI/CD)
 
 on:
   push:
@@ -7,15 +7,18 @@ on:
     branches: [ deploy ]
 
 jobs:
+  # =============================
+  # 1️⃣ BUILD & TEST
+  # =============================
   build:
     runs-on: ubuntu-latest
 
     steps:
-      # 1️⃣ 깃허브 레포 체크아웃
+      # --- 공통: 깃허브 체크아웃 ---
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 2️⃣ 백엔드 (Flask) 환경 세팅
+      # --- 백엔드 (Flask) ---
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -34,7 +37,7 @@ jobs:
           source camera/venv/bin/activate
           python -m compileall camera/api_server.py
 
-      # 3️⃣ 프론트엔드 (Vite) 빌드
+      # --- 프론트엔드 (Vite React) ---
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
@@ -50,21 +53,40 @@ jobs:
           cd front
           npm run build
 
+  # =============================
+  # 2️⃣ DEPLOY TO RENDER
+  # =============================
   deploy:
-    needs: build       # 빌드 성공 후 실행됨
+    needs: build
     runs-on: ubuntu-latest
 
     steps:
-      - name: Trigger Render deploy
+      # --- 백엔드 배포 ---
+      - name: Trigger Render Backend Deploy
         env:
           RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
-          RENDER_SERVICE_ID: srv-d43qn1be5dus73a8l3g0  # 현정 Render 서비스 ID
+          RENDER_BACKEND_SERVICE_ID: srv-d43qn1be5dus73a8l3g0
         run: |
-          echo "🚀 Build successful — triggering Render deploy..."
+          echo "🚀 Triggering Render deploy for Backend..."
           curl -X POST \
             -H "Accept: application/json" \
             -H "Authorization: Bearer $RENDER_API_KEY" \
             -H "Content-Type: application/json" \
             -d '{"clearCache": false}' \
-            https://api.render.com/v1/services/$RENDER_SERVICE_ID/deploys
-          echo "✅ Render deploy triggered! Check https://neckproject.onrender.com"
+            https://api.render.com/v1/services/$RENDER_BACKEND_SERVICE_ID/deploys
+          echo "✅ Backend deploy triggered! Check https://neckproject.onrender.com"
+
+      # --- 프론트엔드 배포 ---
+      - name: Trigger Render Frontend Deploy
+        env:
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+          RENDER_FRONTEND_SERVICE_ID: srv-d43rdge3jp1c73aio3a0
+        run: |
+          echo "🚀 Triggering Render deploy for Frontend..."
+          curl -X POST \
+            -H "Accept: application/json" \
+            -H "Authorization: Bearer $RENDER_API_KEY" \
+            -H "Content-Type: application/json" \
+            -d '{"clearCache": false}' \
+            https://api.render.com/v1/services/$RENDER_FRONTEND_SERVICE_ID/deploys
+          echo "✅ Frontend deploy triggered! Check https://neckproject-fronted.onrender.com"
