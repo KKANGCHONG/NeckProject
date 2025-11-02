@@ -10,10 +10,10 @@ const CameraPage: React.FC = () => {
   const [accuracy, setAccuracy] = useState(100);
   const [status, setStatus] = useState("Not Calibrated");
 
-    const BASE_URL =
-    import.meta.env.MODE === "production"
-      ? import.meta.env.VITE_API_BASE_URL
-      : "http://localhost:8000";
+  const BASE_URL =
+  import.meta.env.MODE === "production"
+    ? import.meta.env.VITE_API_BASE_URL
+    : "http://localhost:8000";
 
   useEffect(() => {
     const interval = setInterval(async () => {
@@ -39,7 +39,7 @@ const CameraPage: React.FC = () => {
   // 기준 설정 버튼 클릭 시 호출될 함수
   const handleCalibrate = async () => {
     try {
-      const response = await fetch("http://localhost:8000/calibrate", {
+      const response = await fetch(`${BASE_URL}/calibrate`, {
         method: 'POST',
       });
       if (response.ok) {

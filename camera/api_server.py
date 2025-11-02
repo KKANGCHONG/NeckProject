@@ -1,5 +1,5 @@
 from flask import Flask, Response, jsonify
-from flask_cors import CORS # CORS import
+from flask_cors import CORS 
 import cv2
 import mediapipe as mp
 import time
